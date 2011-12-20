@@ -167,10 +167,10 @@ class TestCsvPlot(unittest.TestCase):
     def test_10_2_columns_plot_with_one_as_label(self):
         image_filename = get_filename_from_frame(inspect.currentframe())
         my_plot = Plotter(self.data['int-int'])
-        my_plot.plot('linear', image_filename, xlabels='Y Values')
+        my_plot.plot('linear', image_filename, x_labels='Y Values')
 
     def test_11_ignore_columns(self):
         image_filename = get_filename_from_frame(inspect.currentframe())
         my_plot = Plotter(self.data['int-int-int'])
-        my_plot.plot('linear', image_filename, xlabels='Y Values',
+        my_plot.plot('linear', image_filename, x_labels='Y Values',
                      ignore=['X Values', 'Y Values'])

@@ -21,7 +21,7 @@ class Plotter(object):
         self.columns = zip(*self.data.rows)
 
     def plot(self, kind='linear', to='', title='', labels=True, grid=True,
-             legends=True, style='o-', ignore=None, xlabels=None,
+             legends=True, style='o-', ignore=None, x_labels=None,
              x_column=None, aggregate=None):
         '''Does the plot with passed configurations and save the result in a
         file.
@@ -31,7 +31,7 @@ class Plotter(object):
         to -- filename to save the plot file
         title -- the title of the graph
         labels -- should put x and y labels? Default: True
-        xlabels -- header name of the column to put values in x axe
+        x_labels -- header name of the column to put values in x axe
         grid -- should put a grid in the graph? Default: True)
         legends -- should use legends in the curves? Default: True
         style -- the style used for the curve (see matplotlib). Default: 'o-'
@@ -43,7 +43,7 @@ class Plotter(object):
         self.title = title
         self.grid = grid
         self.labels = labels
-        self.xlabels = xlabels
+        self.x_labels = x_labels
         self.x_column = x_column
         self.legends = legends
         self.style = style
@@ -74,13 +74,13 @@ class Plotter(object):
     def _plot_linear(self):
         for index, column in enumerate(self.filtered_columns):
             header = self.data.headers[index]
-            if self.xlabels is not None and header == self.xlabels or \
+            if self.x_labels is not None and header == self.x_labels or \
                column is None:
                 continue
             if self.data.types[header] in (int, float):
                 self.ax.plot(column, self.style, label=self.legends[header])
-        if self.xlabels is not None:
-            x_labels = self.columns[self.data.headers.index(self.xlabels)]
+        if self.x_labels is not None:
+            x_labels = self.columns[self.data.headers.index(self.x_labels)]
             self.ax.set_xticklabels(x_labels)
 
     def _plot_scatter(self):
