@@ -1,5 +1,5 @@
 test:	clean clear_screen
-	nosetests --with-coverage --cover-package csv_plotter -s
+	nosetests --with-coverage --cover-package plotter -s
 
 clean:
 	@rm -rf *.pyc *.png
