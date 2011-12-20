@@ -17,10 +17,8 @@ class Plotter(object):
                      'bar': self._plot_bar}
 
     def load_data(self, data):
-        info = data.split(':')
-        if len(info) and info[0] == 'csv':
-            self.data = Table(from_csv=':'.join(info[1:]))
-            self.columns = zip(*self.data.rows)
+        self.data = Table(from_csv=data)
+        self.columns = zip(*self.data.rows)
 
     def plot(self, kind='linear', to='', title='', labels=True, grid=True,
              legends=True, style='o-', ignore=None, xlabels=None,
