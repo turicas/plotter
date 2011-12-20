@@ -7,7 +7,7 @@ import shutil
 import tempfile
 import inspect
 from textwrap import dedent
-import csv_plotter
+from plotter import Plotter
 
 
 TEST_RESULTS_PATH = 'test_results'
@@ -120,50 +120,57 @@ class TestCsvPlot(unittest.TestCase):
 
     def test_01_2_columns_with_only_data_no_scatter(self):
         image_filename = get_filename_from_frame(inspect.currentframe())
-        csv_plotter.linear(self.data['int-int'], image_filename,
-                           title='Hello, world')
+        my_plot = Plotter('csv:' + self.data['int-int'])
+        my_plot.plot('linear', image_filename, title='Hello, world')
 
     def test_02_2_columns_with_only_data_scatter(self):
         image_filename = get_filename_from_frame(inspect.currentframe())
-        csv_plotter.scatter(self.data['int-int'], image_filename)
+        my_plot = Plotter('csv:' + self.data['int-int'])
+        my_plot.plot('scatter', image_filename)
 
     def test_03_2_columns_with_one_as_date_no_scatter(self):
         image_filename = get_filename_from_frame(inspect.currentframe())
-        csv_plotter.linear(self.data['date-int'], image_filename)
+        my_plot = Plotter('csv:' + self.data['date-int'])
+        my_plot.plot('linear', image_filename)
 
     def test_04_2_columns_with_one_as_date_scatter(self):
         image_filename = get_filename_from_frame(inspect.currentframe())
-        csv_plotter.scatter(self.data['date-int'], image_filename)
+        my_plot = Plotter('csv:' + self.data['date-int'])
+        my_plot.plot('scatter', image_filename)
 
     def test_05_3_columns_with_one_as_date_scatter_no_labels(self):
         image_filename = get_filename_from_frame(inspect.currentframe())
-        csv_plotter.scatter(self.data['int-int-date'], image_filename,
-                            labels=False)
+        my_plot = Plotter('csv:' + self.data['date-int'])
+        my_plot.plot('scatter', image_filename, labels=False)
 
     def test_06_3_columns_with_one_as_date_and_x_as_int_scatter(self):
         image_filename = get_filename_from_frame(inspect.currentframe())
-        csv_plotter.scatter(self.data['int-int-date'], image_filename,
-                            x_column='Y Values')
+        my_plot = Plotter('csv:' + self.data['int-int-date'])
+        my_plot.plot('scatter', image_filename, x_column='Y Values')
 
     def test_07_1_column_barplot(self):
         image_filename = get_filename_from_frame(inspect.currentframe())
-        csv_plotter.bar(self.data['int'], image_filename)
+        my_plot = Plotter('csv:' + self.data['int'])
+        my_plot.plot('bar', image_filename)
 
     def test_08_2_columns_barplot(self):
         image_filename = get_filename_from_frame(inspect.currentframe())
-        csv_plotter.bar(self.data['int-int'], image_filename)
+        my_plot = Plotter('csv:' + self.data['int-int'])
+        my_plot.plot('bar', image_filename)
 
     def test_09_1_column_with_aggregate(self):
         image_filename = get_filename_from_frame(inspect.currentframe())
-        csv_plotter.bar(self.data['animals'], image_filename, aggregate='animal',
-                        legends=False)
+        my_plot = Plotter('csv:' + self.data['animals'])
+        my_plot.plot('bar', image_filename, aggregate='animal',
+                legends={'animal': 'Animals'})
 
     def test_10_2_columns_plot_with_one_as_label(self):
         image_filename = get_filename_from_frame(inspect.currentframe())
-        csv_plotter.linear(self.data['int-int'], image_filename,
-                           xlabel='Y Values')
+        my_plot = Plotter('csv:' + self.data['int-int'])
+        my_plot.plot('linear', image_filename, xlabels='Y Values')
 
     def test_11_ignore_columns(self):
         image_filename = get_filename_from_frame(inspect.currentframe())
-        csv_plotter.linear(self.data['int-int-int'], image_filename,
-                           ignore=['X Values', 'Y Values'], xlabel='Y Values')
+        my_plot = Plotter('csv:' + self.data['int-int-int'])
+        my_plot.plot('linear', image_filename, xlabels='Y Values',
+                     ignore=['X Values', 'Y Values'])
