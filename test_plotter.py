@@ -112,6 +112,40 @@ class TestCsvPlot(unittest.TestCase):
         coati
         ''')
         cls.data['animals'] = create_temp_csv(file_contents)
+        file_contents = dedent('''
+        product_name,quantity,year
+        E,235,2004
+        A,170,2005
+        B,256,2005
+        D,154,2001
+        A,200,2000
+        B,300,2000
+        C,345,2001
+        D,156,2004
+        E,234,2001
+        C,250,2000
+        D,245,2000
+        E,190,2000
+        A,240,2001
+        B,286,2001
+        A,210,2002
+        B,226,2002
+        C,335,2002
+        D,254,2003
+        E,134,2003
+        A,249,2004
+        B,288,2004
+        C,347,2004
+        D,144,2002
+        E,254,2002
+        A,340,2003
+        B,386,2003
+        C,245,2003
+        C,195,2005
+        D,234,2005
+        E,234,2005
+        ''')
+        cls.data['bar-data'] = create_temp_csv(file_contents)
 
     @classmethod
     def tearDownClass(cls):
@@ -174,3 +208,10 @@ class TestCsvPlot(unittest.TestCase):
         my_plot = Plotter(self.data['int-int-int'])
         my_plot.plot('linear', image_filename, x_labels='Y Values',
                      ignore=['X Values', 'Y Values'])
+
+    def test_12_plot_stacked_bars(self):
+        image_filename = get_filename_from_frame(inspect.currentframe())
+        my_plot = Plotter(self.data['bar-data'])
+        my_plot.plot('stackedbar', image_filename, x_column='year',
+                     y_column='quantity', y_labels='product_name',
+                     title='Stacked bars example')

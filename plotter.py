@@ -3,7 +3,9 @@
 
 import datetime
 from collections import Counter
+import numpy
 from matplotlib.pyplot import figure
+import matplotlib.cm
 from outputty import Table
 
 
@@ -14,15 +16,17 @@ class Plotter(object):
         self.load_data(data)
         self.PLOT = {'linear': self._plot_linear,
                      'scatter': self._plot_scatter,
-                     'bar': self._plot_bar}
+                     'bar': self._plot_bar,
+                     'stackedbar': self._plot_stacked_bar}
 
     def load_data(self, data):
-        self.data = Table(from_csv=data)
+        self.data = Table()
+        self.data.read('csv', data)
         self.columns = zip(*self.data.rows)
 
     def plot(self, kind='linear', to='', title='', labels=True, grid=True,
              legends=True, style='o-', ignore=None, x_labels=None,
-             x_column=None, aggregate=None):
+             x_column=None, y_column=None, y_labels=None, aggregate=None):
         '''Does the plot with passed configurations and save the result in a
         file.
 
@@ -44,7 +48,9 @@ class Plotter(object):
         self.grid = grid
         self.labels = labels
         self.x_labels = x_labels
+        self.y_labels = y_labels
         self.x_column = x_column
+        self.y_column = y_column
         self.legends = legends
         self.style = style
         self.ignore = ignore
@@ -59,17 +65,20 @@ class Plotter(object):
         else:
             self.filtered_columns = self.columns
         if not self.legends or self.legends is True:
-            self.legends = dict([(header, header) \
-                                 for header in self.data.headers])
+            self.legends = {header: header for header in self.data.headers}
 
         self.fig = figure()
         self.ax = self.fig.add_subplot(111)
+        if kind == 'stackedbar':
+            self.fig.subplots_adjust(bottom=0.1, left=0.25)
         self.ax.set_title(title)
         self.ax.grid(grid)
         self.PLOT[kind]()
-        if self.legends and kind != 'bar':
+        if self.legends and kind not in ('bar', 'stackedbar'):
             self.ax.legend()
-        self.fig.savefig(to, bbox_inches='tight', pad_inches=0.1)
+            self.fig.savefig(to, bbox_inches='tight', pad_inches=0.1)
+        elif kind in ('bar', 'stackedbar'):
+            self.fig.savefig(to)
 
     def _plot_linear(self):
         for index, column in enumerate(self.filtered_columns):
@@ -80,7 +89,7 @@ class Plotter(object):
             if self.data.types[header] in (int, float):
                 self.ax.plot(column, self.style, label=self.legends[header])
         if self.x_labels is not None:
-            x_labels = self.columns[self.data.headers.index(self.x_labels)]
+            x_labels = self.data[self.x_labels]
             self.ax.set_xticklabels(x_labels)
 
     def _plot_scatter(self):
@@ -114,8 +123,7 @@ class Plotter(object):
         bar_offset = (bar_increment - bar_width) / 2.0
         bars_titles = []
         if self.aggregate:
-            aggregate_index = self.data.headers.index(self.aggregate)
-            counter = Counter(self.columns[aggregate_index])
+            counter = Counter(self.data[self.aggregate])
             xticklabels = counter.keys()
             columns_to_plot = [[counter[k] for k in xticklabels]]
         else:
@@ -144,3 +152,34 @@ class Plotter(object):
                 bars_titles = [self.legends[self.aggregate]]
             self.ax.legend(bars, bars_titles)
         self.ax.set_xticklabels(xticklabels)
+
+    def _plot_stacked_bar(self):
+        x_rotation = 0
+        bar_width = 0.5
+        legend_location = 'upper left'
+        legend_box = (-0.4, 1)
+        colormap = matplotlib.cm.gist_heat
+
+        x_offset = (1.0 - bar_width) / 2
+        x_values = list(set(self.data[self.x_column]))
+        x_values.sort()
+        x_values = numpy.array(x_values)
+        y_labels = list(set(self.data[self.y_labels]))
+        y_labels.sort()
+        y_labels = numpy.array(y_labels)
+        self.ax.set_xticks(x_values + x_offset)
+        self.ax.set_xticklabels(x_values, rotation=x_rotation)
+        colors = [colormap(i) for i in numpy.linspace(0, 0.9, len(y_labels))]
+        count = 0
+        data = {y: Counter() for y in y_labels}
+        for row in self.data.to_list_of_dicts():
+            data[row[self.y_labels]][row[self.x_column]] += row[self.y_column]
+        bottom = numpy.zeros(len(x_values))
+        for y in y_labels:
+            values = [data[y][x] for x in x_values]
+            self.ax.bar(x_values, values, width=bar_width, label=y,
+                        color=colors[count], bottom=bottom)
+            bottom = [bottom[index] + value \
+                      for index, value in enumerate(values)]
+            count += 1
+        self.ax.legend(loc=legend_location, bbox_to_anchor=legend_box)
