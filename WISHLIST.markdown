@@ -9,3 +9,5 @@ Wishlist
   so we can use a lot of data sources.
 - Create a `plot` plugin to `outputty`.
 - Pack and send it to PyPI.
+- Should have a way to set xmin, xmax, ymin and ymax
+- `aggregate` should work on `Plotter.bar`

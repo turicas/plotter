@@ -21,7 +21,7 @@ Requirements/Installation
 Examples
 --------
 
-If do you have a CSV file called `data.csv` with this content:
+If you have a CSV file called `data.csv` with this content:
 
     "X Values","Y Values","Z Values"
     1,1,2011-01-01
@@ -46,7 +46,7 @@ then `data.png` will be created:
 
 <img src="http://www.justen.eng.br/projects/plotter/img/data.png">
 
-> For more example please see file `test_plotter.py`. If do you run it, a
+> For more example please see file `test_plotter.py`. If you run it, a
 > directory called `test_results` will be created with the plots.
 
 
