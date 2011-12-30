@@ -200,10 +200,16 @@ class TestCsvPlot(unittest.TestCase):
         my_plot.bar()
         my_plot.save(image_filename)
 
-    def test_09_1_column_with_aggregate(self):
+    def test_08_2_columns_barplot_with_x_rotation(self):
+        image_filename = get_filename_from_frame(inspect.currentframe())
+        my_plot = Plotter(self.data['int-int'])
+        my_plot.bar(x_rotation=45)
+        my_plot.save(image_filename)
+
+    def test_09_bar_plot_and_1_column_with_count(self):
         image_filename = get_filename_from_frame(inspect.currentframe())
         my_plot = Plotter(self.data['animals'])
-        my_plot.bar(aggregate='animal', legends={'animal': 'Animals'})
+        my_plot.bar(count='animal', legends={'animal': 'Animals'})
         my_plot.save(image_filename)
 
     def test_10_2_columns_plot_with_one_as_label(self):

@@ -75,9 +75,9 @@ class Plotter(object):
                          label=legends[header], color=colors.pop(0))
         subplot.legend()
 
-    def bar(self, title='', grid=True, aggregate=None, bar_width=0.8,
+    def bar(self, title='', grid=True, count=None, bar_width=0.8,
             bar_start=0.5, bar_increment=1.0, legends=True,
-            colors=None, colormap=matplotlib.cm.PRGn):
+            x_rotation=0, colors=None, colormap=matplotlib.cm.PRGn):
         if legends is None or legends is True:
             legends = {header: header for header in self.data.headers}
         subplot = self._get_new_subplot()
@@ -85,8 +85,8 @@ class Plotter(object):
         subplot.grid(grid)
         bar_offset = (bar_increment - bar_width) / 2.0
         bars_titles = []
-        if aggregate is not None:
-            counter = Counter(self.data[aggregate])
+        if count is not None:
+            counter = Counter(self.data[count])
             xticklabels = counter.keys()
             columns_to_plot = [[counter[k] for k in xticklabels]]
         else:
@@ -110,14 +110,14 @@ class Plotter(object):
                   for i in range(len(lefts))]
         subplot.set_xticks(xticks)
         if legends:
-            if not aggregate:
+            if not count:
                 bars_titles = [legends[header] \
                                for header in self.data.headers]
                 xticklabels = ['' for t in range(len(xticks))]
             else:
-                bars_titles = [legends[aggregate]]
+                bars_titles = [legends[count]]
             subplot.legend(bars, bars_titles)
-        subplot.set_xticklabels(xticklabels)
+        subplot.set_xticklabels(xticklabels, rotation=x_rotation)
 
     def stacked_bar(self, x_column, y_column, y_labels=None, title='',
                     grid=True, bar_width=0.5, x_rotation=0, legends=True,
