@@ -12,7 +12,10 @@ from outputty import Table
 class Plotter(object):
     'Stores information about a plot and plot it'
 
-    def __init__(self, data=None, legends=None):
+    def __init__(self, data=None, rows=1, cols=1):
+        self.rows = rows
+        self.cols = cols
+        self._subplot_number = 0
         self.fig = figure()
         self._load_data(data)
 
@@ -22,7 +25,11 @@ class Plotter(object):
         self.columns = zip(*self.data.rows)
 
     def _get_new_subplot(self):
-        return self.fig.add_subplot(111)
+        self._subplot_number += 1
+        if self._subplot_number > self.rows * self.cols:
+            raise OverflowError('This figure can handle only %d subplots' % \
+                                self.rows * self.cols)
+        return self.fig.add_subplot(self.rows, self.cols, self._subplot_number)
 
     def save(self, filename):
         #self.fig.savefig(filename, bbox_inches='tight', pad_inches=0.1)
