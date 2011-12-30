@@ -8,15 +8,14 @@ plots (without all pain of using matplotlib). By now you can do linear, scatter
 and bar plots with data from CSV files.
 
 
-Requirements
-------------
+Requirements/Installation
+-------------------------
 
-Just execute:
-
-    wget https://raw.github.com/turicas/outputty/master/outputty.py
-    pip install matplotlib
-
-and download `plotter.py`.
+- Execute `pip install numpy matplotlib`
+- [Download outputty](https://github.com/turicas/outputty/tarball/master)
+- [Download plotter](https://github.com/turicas/plotter/tarball/master)
+- Unpack `outputty` and `plotter` in the same directory (sorry for that - it'll
+  be available on PyPI soon)
 
 
 Examples
@@ -39,7 +38,9 @@ and execute this little piece of code:
 
     from plotter import Plotter
     my_plot = Plotter('data.csv')
-    my_plot.plot('scatter', 'data.png', x_column='Z Values')
+    my_plot.scatter(x_column='Z Values', title='Hello, plotter!',
+                    colors=['blue', 'red'])
+    my_plot.save('data.png')
 
 then `data.png` will be created:
 
