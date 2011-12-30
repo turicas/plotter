@@ -155,63 +155,106 @@ class TestCsvPlot(unittest.TestCase):
     def test_01_2_columns_with_only_data_no_scatter(self):
         image_filename = get_filename_from_frame(inspect.currentframe())
         my_plot = Plotter(self.data['int-int'])
-        my_plot.plot('linear', image_filename, title='Hello, world')
+        my_plot.linear(title='Hello, world')
+        my_plot.save(image_filename)
 
     def test_02_2_columns_with_only_data_scatter(self):
         image_filename = get_filename_from_frame(inspect.currentframe())
         my_plot = Plotter(self.data['int-int'])
-        my_plot.plot('scatter', image_filename)
+        my_plot.scatter(x_column='X Values')
+        my_plot.save(image_filename)
 
     def test_03_2_columns_with_one_as_date_no_scatter(self):
         image_filename = get_filename_from_frame(inspect.currentframe())
         my_plot = Plotter(self.data['date-int'])
-        my_plot.plot('linear', image_filename)
+        my_plot.linear()
+        my_plot.save(image_filename)
 
     def test_04_2_columns_with_one_as_date_scatter(self):
         image_filename = get_filename_from_frame(inspect.currentframe())
         my_plot = Plotter(self.data['date-int'])
-        my_plot.plot('scatter', image_filename)
+        my_plot.scatter(x_column='X Values')
+        my_plot.save(image_filename)
 
     def test_05_3_columns_with_one_as_date_scatter_no_labels(self):
         image_filename = get_filename_from_frame(inspect.currentframe())
         my_plot = Plotter(self.data['date-int'])
-        my_plot.plot('scatter', image_filename, labels=False)
+        my_plot.scatter(x_column='X Values', labels=False)
+        my_plot.save(image_filename)
 
     def test_06_3_columns_with_one_as_date_and_x_as_int_scatter(self):
         image_filename = get_filename_from_frame(inspect.currentframe())
         my_plot = Plotter(self.data['int-int-date'])
-        my_plot.plot('scatter', image_filename, x_column='Y Values')
+        my_plot.scatter(x_column='Y Values')
+        my_plot.save(image_filename)
 
     def test_07_1_column_barplot(self):
         image_filename = get_filename_from_frame(inspect.currentframe())
         my_plot = Plotter(self.data['int'])
-        my_plot.plot('bar', image_filename)
+        my_plot.bar()
+        my_plot.save(image_filename)
 
     def test_08_2_columns_barplot(self):
         image_filename = get_filename_from_frame(inspect.currentframe())
         my_plot = Plotter(self.data['int-int'])
-        my_plot.plot('bar', image_filename)
+        my_plot.bar()
+        my_plot.save(image_filename)
 
     def test_09_1_column_with_aggregate(self):
         image_filename = get_filename_from_frame(inspect.currentframe())
         my_plot = Plotter(self.data['animals'])
-        my_plot.plot('bar', image_filename, aggregate='animal',
-                legends={'animal': 'Animals'})
+        my_plot.bar(aggregate='animal', legends={'animal': 'Animals'})
+        my_plot.save(image_filename)
 
     def test_10_2_columns_plot_with_one_as_label(self):
         image_filename = get_filename_from_frame(inspect.currentframe())
         my_plot = Plotter(self.data['int-int'])
-        my_plot.plot('linear', image_filename, x_labels='Y Values')
+        my_plot.linear(x_labels='Y Values')
+        my_plot.save(image_filename)
 
-    def test_11_ignore_columns(self):
+    def test_11_ignore_columns_linear(self):
         image_filename = get_filename_from_frame(inspect.currentframe())
         my_plot = Plotter(self.data['int-int-int'])
-        my_plot.plot('linear', image_filename, x_labels='Y Values',
-                     ignore=['X Values', 'Y Values'])
+        my_plot.linear(x_labels='Y Values', ignore=['X Values', 'Y Values'])
+        my_plot.save(image_filename)
+
+    def test_11_ignore_columns_scatter(self):
+        image_filename = get_filename_from_frame(inspect.currentframe())
+        my_plot = Plotter(self.data['int-int-int'])
+        my_plot.scatter(x_column='Y Values', ignore=['X Values'])
+        my_plot.save(image_filename)
 
     def test_12_plot_stacked_bars(self):
         image_filename = get_filename_from_frame(inspect.currentframe())
         my_plot = Plotter(self.data['bar-data'])
-        my_plot.plot('stackedbar', image_filename, x_column='year',
-                     y_column='quantity', y_labels='product_name',
-                     title='Stacked bars example')
+        my_plot.stacked_bar(x_column='year', y_column='quantity',
+                            y_labels='product_name',
+                            title='Stacked bars example')
+        my_plot.save(image_filename)
+
+    def test_13_use_colors_instead_of_colormap_linear(self):
+        image_filename = get_filename_from_frame(inspect.currentframe())
+        my_plot = Plotter(self.data['int-int-int'])
+        my_plot.linear(x_labels='Y Values', colors=['red', 'blue'])
+        my_plot.save(image_filename)
+
+    def test_13_use_colors_instead_of_colormap_scatter(self):
+        image_filename = get_filename_from_frame(inspect.currentframe())
+        my_plot = Plotter(self.data['int-int-int'])
+        my_plot.scatter(x_column='Y Values', colors=['red', 'blue'])
+        my_plot.save(image_filename)
+
+    def test_13_use_colors_instead_of_colormap_bar(self):
+        image_filename = get_filename_from_frame(inspect.currentframe())
+        my_plot = Plotter(self.data['int-int-int'])
+        my_plot.bar(colors=['red', 'blue', 'yellow'])
+        my_plot.save(image_filename)
+
+    def test_13_use_colors_instead_of_colormap_stacked_bar(self):
+        image_filename = get_filename_from_frame(inspect.currentframe())
+        my_plot = Plotter(self.data['bar-data'])
+        my_plot.stacked_bar(x_column='year', y_column='quantity',
+                            y_labels='product_name',
+                            title='Stacked bars example',
+                            colors=['red', 'blue', 'yellow', 'magenta', 'gray'])
+        my_plot.save(image_filename)
