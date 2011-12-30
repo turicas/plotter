@@ -63,6 +63,7 @@ class Plotter(object):
         subplot = self._get_new_subplot()
         subplot.set_title(title)
         subplot.grid(grid)
+        self.data.order_by(x_column)
         if legends is None or legends is True:
             legends = {header: header for header in self.data.headers}
         if self.data.types[x_column] in (datetime.date, datetime.datetime):

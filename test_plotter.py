@@ -59,6 +59,19 @@ class TestCsvPlot(unittest.TestCase):
         cls.data['int-int'] = create_temp_csv(file_contents)
         file_contents = dedent('''
         "X Values","Y Values"
+        8,64
+        9,81
+        1,1
+        3,9
+        5,25
+        2,4
+        4,16
+        6,36
+        7,49
+        ''')
+        cls.data['int-int-unordered'] = create_temp_csv(file_contents)
+        file_contents = dedent('''
+        "X Values","Y Values"
         2011-01-01,1
         2011-01-02,4
         2011-01-03,9
@@ -154,6 +167,12 @@ class TestCsvPlot(unittest.TestCase):
     def test_02_2_columns_with_only_data_scatter(self):
         image_filename = get_filename_from_frame(inspect.currentframe())
         my_plot = Plotter(self.data['int-int'])
+        my_plot.scatter(x_column='X Values')
+        my_plot.save(image_filename)
+
+    def test_02_2_columns_with_unordered_data_scatter(self):
+        image_filename = get_filename_from_frame(inspect.currentframe())
+        my_plot = Plotter(self.data['int-int-unordered'])
         my_plot.scatter(x_column='X Values')
         my_plot.save(image_filename)
 
