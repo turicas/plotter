@@ -287,3 +287,10 @@ class TestCsvPlot(unittest.TestCase):
                             x_rotation=45)
         my_plot.bar(count='year', x_rotation=45, title='Bar plot')
         my_plot.save(image_filename)
+
+    def test_should_raises_OverflowError_when_exceed_number_of_subplots(self):
+        my_plot = Plotter(self.data['bar-data'], rows=2, cols=1)
+        my_plot.linear(ignore=['product_name', 'year'])
+        my_plot.linear(ignore=['product_name', 'year'])
+        with self.assertRaises(OverflowError):
+            my_plot.linear(ignore=['product_name', 'year'])

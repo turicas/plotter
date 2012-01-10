@@ -22,7 +22,6 @@ class Plotter(object):
     def _load_data(self, data):
         self.data = Table()
         self.data.read('csv', data)
-        self.columns = zip(*self.data.rows)
 
     def _get_new_subplot(self):
         self._subplot_number += 1
@@ -86,7 +85,7 @@ class Plotter(object):
     def bar(self, title='', grid=True, count=None, bar_width=0.8,
             bar_start=0.5, bar_increment=1.0, legends=True,
             x_rotation=0, colors=None, colormap=matplotlib.cm.PRGn):
-        if legends is None or legends is True:
+        if legends is True:
             legends = {header: header for header in self.data.headers}
         subplot = self._get_new_subplot()
         subplot.set_title(title)
@@ -99,10 +98,10 @@ class Plotter(object):
             columns_to_plot = [[counter[k] for k in xticklabels]]
         else:
             columns_to_plot = []
-            for index in range(len(self.columns)):
-                if self.data.types[self.data.headers[index]] in (int, float):
-                    columns_to_plot.append(self.columns[index])
-                    bars_titles.append(self.data.headers[index])
+            for header in self.data.headers:
+                if self.data.types[header] in (int, float):
+                    columns_to_plot.append(self.data[header])
+                    bars_titles.append(header)
         bar_width /= float(len(columns_to_plot))
         bars = []
         if colors is None:
@@ -118,10 +117,10 @@ class Plotter(object):
                   for i in range(len(lefts))]
         subplot.set_xticks(xticks)
         if legends:
-            if not count:
+            if count is None:
                 bars_titles = [legends[header] \
                                for header in self.data.headers]
-                xticklabels = ['' for t in range(len(xticks))]
+                xticklabels = xticks
             else:
                 bars_titles = [legends[count]]
             subplot.legend(bars, bars_titles)
@@ -134,8 +133,6 @@ class Plotter(object):
         subplot = self._get_new_subplot()
         subplot.set_title(title)
         subplot.grid(grid)
-        if y_labels is None:
-            y_labels = y_column
         x_offset = (1.0 - bar_width) / 2
         x_values = list(set(self.data[x_column]))
         x_values.sort()
