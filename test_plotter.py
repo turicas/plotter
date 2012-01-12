@@ -200,6 +200,12 @@ class TestCsvPlot(unittest.TestCase):
         my_plot.scatter(x_column='Y Values')
         my_plot.save(image_filename)
 
+    def test_06_scatter_with_x_column_as_string(self):
+        image_filename = get_filename_from_frame(inspect.currentframe())
+        my_plot = Plotter(self.data['int-int-date'])
+        my_plot.scatter(x_column='Y Values')
+        my_plot.save(image_filename)
+
     def test_07_1_column_barplot(self):
         image_filename = get_filename_from_frame(inspect.currentframe())
         my_plot = Plotter(self.data['int'])

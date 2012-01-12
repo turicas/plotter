@@ -12,11 +12,11 @@ from outputty import Table
 class Plotter(object):
     'Stores information about a plot and plot it'
 
-    def __init__(self, data=None, rows=1, cols=1):
+    def __init__(self, data=None, rows=1, cols=1, width=1024, height=768):
         self.rows = rows
         self.cols = cols
         self._subplot_number = 0
-        self.fig = figure()
+        self.fig = figure(figsize=(width / 80, height / 80), dpi=80)
         self._load_data(data)
 
     def _load_data(self, data):
@@ -58,18 +58,24 @@ class Plotter(object):
 
     def scatter(self, x_column, title='', grid=True, labels=True, legends=True,
                 style='o-', ignore='', colors=None,
-                colormap=matplotlib.cm.PRGn):
+                colormap=matplotlib.cm.PRGn, order_by=None, ordering='asc',
+                x_label=None, y_lim=None, legend_location='upper center',
+                legend_box=(0.5, 2)):
         subplot = self._get_new_subplot()
         subplot.set_title(title)
         subplot.grid(grid)
-        self.data.order_by(x_column)
-        if legends is None or legends is True:
+        if order_by is None:
+            order_by = x_column
+        self.data.order_by(order_by, ordering)
+        if legends is True:
             legends = {header: header for header in self.data.headers}
         if self.data.types[x_column] in (datetime.date, datetime.datetime):
             self.fig.autofmt_xdate()
         if labels:
-            subplot.set_xlabel(x_column)
-        x_values = self.data[x_column]
+            if x_label is None:
+                x_label = x_column
+            subplot.set_xlabel(x_label)
+        x_values = range(len(self.data[x_column]))
         columns_to_plot = []
         for header in set(self.data.headers) - set(ignore):
             if header != x_column and self.data.types[header] in (int, float):
@@ -78,13 +84,24 @@ class Plotter(object):
             color_range = numpy.linspace(0, 0.9, len(columns_to_plot))
             colors = [colormap(i) for i in color_range]
         for header in columns_to_plot:
-            subplot.plot(x_values, self.data[header], style,
-                         label=legends[header], color=colors.pop(0))
-        subplot.legend()
+            if legends is None:
+                subplot.plot(x_values, self.data[header], style,
+                             color=colors.pop(0))
+            else:
+                subplot.plot(x_values, self.data[header], style,
+                             label=legends[header], color=colors.pop(0))
+        subplot.set_xticks(x_values)
+        subplot.set_xticklabels(self.data[x_column])
+        if y_lim is not None:
+            subplot.set_ylim(y_lim)
+        if legends is not None:
+            subplot.legend(loc=legend_location, bbox_to_anchor=legend_box)
+            self.fig.subplots_adjust(top=0.5, right=0.9)
 
-    def bar(self, title='', grid=True, count=None, bar_width=0.8,
+    def bar(self, title='', grid=True, count=None, bar_width=0.8, x_column='',
             bar_start=0.5, bar_increment=1.0, legends=True,
-            x_rotation=0, colors=None, colormap=matplotlib.cm.PRGn):
+            x_rotation=0, colors=None, colormap=matplotlib.cm.PRGn,
+            y_label=None, y_lim=None):
         if legends is True:
             legends = {header: header for header in self.data.headers}
         subplot = self._get_new_subplot()
@@ -124,7 +141,13 @@ class Plotter(object):
             else:
                 bars_titles = [legends[count]]
             subplot.legend(bars, bars_titles)
+        else:
+            xticklabels = self.data[x_column]
         subplot.set_xticklabels(xticklabels, rotation=x_rotation)
+        if y_label is not None:
+            subplot.set_ylabel(y_label)
+        if y_lim is not None:
+            subplot.set_ylim(y_lim)
 
     def stacked_bar(self, x_column, y_column, y_labels=None, title='',
                     grid=True, bar_width=0.5, x_rotation=0, legends=True,
