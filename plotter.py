@@ -60,7 +60,7 @@ class Plotter(object):
                 style='o-', ignore='', colors=None,
                 colormap=matplotlib.cm.PRGn, order_by=None, ordering='asc',
                 x_label=None, y_lim=None, legend_location='upper center',
-                legend_box=(0.5, 2)):
+                legend_box=(0.5, 2.2)):
         subplot = self._get_new_subplot()
         subplot.set_title(title)
         subplot.grid(grid)
@@ -157,23 +157,22 @@ class Plotter(object):
         subplot.set_title(title)
         subplot.grid(grid)
         x_offset = (1.0 - bar_width) / 2
-        x_values = list(set(self.data[x_column]))
-        x_values.sort()
-        x_values = numpy.array(x_values)
+        x_values_unique = list(set(self.data[x_column]))
+        x_values = numpy.array(range(len(set(self.data[x_column]))))
         subplot.set_xticks(x_values + x_offset)
-        subplot.set_xticklabels(x_values, rotation=x_rotation)
+        subplot.set_xticklabels(x_values_unique, rotation=x_rotation)
         y_labels_values = list(set(self.data[y_labels]))
         y_labels_values.sort()
         data = {y: Counter() for y in y_labels_values}
         if colors is None:
             color_range = numpy.linspace(0, 0.9, len(data.keys()))
             colors = [colormap(i) for i in color_range]
-        for row in self.data.to_list_of_dicts():
+        for row in self.data.to_list_of_dicts(encoding=None):
             data[row[y_labels]][row[x_column]] += row[y_column]
         bottom = numpy.zeros(len(x_values))
         for y in y_labels_values:
-            values = [data[y][x] for x in x_values]
-            subplot.bar(x_values, values, width=bar_width, label=y,
+            values = [data[y][x] for x in x_values_unique]
+            subplot.bar(x_values, values, width=bar_width, label=unicode(y),
                         color=colors.pop(0), bottom=bottom)
             bottom = [bottom[index] + value \
                       for index, value in enumerate(values)]
