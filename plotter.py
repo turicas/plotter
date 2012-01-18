@@ -3,7 +3,7 @@
 
 import datetime
 from collections import Counter
-import numpy
+from numpy import linspace, array, zeros, pi, concatenate
 from matplotlib.pyplot import figure
 import matplotlib.cm
 from outputty import Table
@@ -23,12 +23,18 @@ class Plotter(object):
         self.data = Table()
         self.data.read('csv', data)
 
-    def _get_new_subplot(self):
+    def _get_new_subplot(self, projection=None):
         self._subplot_number += 1
         if self._subplot_number > self.rows * self.cols:
             raise OverflowError('This figure can handle only %d subplots' % \
                                 self.rows * self.cols)
-        return self.fig.add_subplot(self.rows, self.cols, self._subplot_number)
+        if projection is not None:
+            return self.fig.add_subplot(self.rows, self.cols,
+                                        self._subplot_number,
+                                        projection=projection)
+        else:
+            return self.fig.add_subplot(self.rows, self.cols,
+                                        self._subplot_number)
 
     def save(self, filename):
         #self.fig.savefig(filename, bbox_inches='tight', pad_inches=0.1)
@@ -47,7 +53,7 @@ class Plotter(object):
             if header != x_labels and self.data.types[header] in (int, float):
                 columns_to_plot.append(header)
         if colors is None:
-            color_range = numpy.linspace(0, 0.9, len(columns_to_plot))
+            color_range = linspace(0, 0.9, len(columns_to_plot))
             colors = [colormap(i) for i in color_range]
         for header in columns_to_plot:
                 subplot.plot(self.data[header], style, label=legends[header],
@@ -81,7 +87,7 @@ class Plotter(object):
             if header != x_column and self.data.types[header] in (int, float):
                 columns_to_plot.append(header)
         if colors is None:
-            color_range = numpy.linspace(0, 0.9, len(columns_to_plot))
+            color_range = linspace(0, 0.9, len(columns_to_plot))
             colors = [colormap(i) for i in color_range]
         for header in columns_to_plot:
             if legends is None:
@@ -122,7 +128,7 @@ class Plotter(object):
         bar_width /= float(len(columns_to_plot))
         bars = []
         if colors is None:
-            color_range = numpy.linspace(0, 0.9, len(columns_to_plot))
+            color_range = linspace(0, 0.9, len(columns_to_plot))
             colors = [colormap(i) for i in color_range]
         for index, column in enumerate(columns_to_plot):
             left = bar_start + index * bar_width
@@ -158,18 +164,18 @@ class Plotter(object):
         subplot.grid(grid)
         x_offset = (1.0 - bar_width) / 2
         x_values_unique = list(set(self.data[x_column]))
-        x_values = numpy.array(range(len(set(self.data[x_column]))))
+        x_values = array(range(len(set(self.data[x_column]))))
         subplot.set_xticks(x_values + x_offset)
         subplot.set_xticklabels(x_values_unique, rotation=x_rotation)
         y_labels_values = list(set(self.data[y_labels]))
         y_labels_values.sort()
         data = {y: Counter() for y in y_labels_values}
         if colors is None:
-            color_range = numpy.linspace(0, 0.9, len(data.keys()))
+            color_range = linspace(0, 0.9, len(data.keys()))
             colors = [colormap(i) for i in color_range]
         for row in self.data.to_list_of_dicts(encoding=None):
             data[row[y_labels]][row[x_column]] += row[y_column]
-        bottom = numpy.zeros(len(x_values))
+        bottom = zeros(len(x_values))
         for y in y_labels_values:
             values = [data[y][x] for x in x_values_unique]
             subplot.bar(x_values, values, width=bar_width, label=unicode(y),
@@ -179,3 +185,36 @@ class Plotter(object):
         if legends:
             subplot.legend(loc=legend_location, bbox_to_anchor=legend_box)
         self.fig.subplots_adjust(bottom=0.1, left=0.25)
+
+    def radar(self, axis_labels, values, legends, title='', grid=True,
+              fill_alpha=0.25, colors=None, colormap=matplotlib.cm.gist_heat):
+        subplot = self._get_new_subplot(projection='polar')
+        subplot.set_title(title)
+        subplot.grid(grid)
+        axis_labels_values = list(set(self.data[axis_labels]))
+        axis_labels_values.sort()
+        number_of_axis = len(axis_labels_values)
+        axis_angles = 2 * pi * linspace(0, 1 - 1.0 / number_of_axis,
+                                        number_of_axis)
+        subplot.set_thetagrids(axis_angles * 180 / pi, axis_labels_values)
+        legends_values = list(set(self.data[legends]))
+        legends_values.sort()
+        if colors is None:
+            len_legends = len(legends_values)
+            color_range = linspace(0, 1 - 1.0 / len_legends, len_legends)
+            colors = [colormap(i) for i in color_range]
+        curves = {x: Counter() for x in legends_values}
+        self.data.order_by(axis_labels)
+        for row in self.data.to_list_of_dicts(encoding=None):
+            curves[row[legends]][row[axis_labels]] += row[values]
+        for key in legends_values:
+            values = [curves[key][x] for x in axis_labels_values]
+            color = colors.pop(0)
+            lines = subplot.plot(axis_angles, values, color=color)
+            subplot.fill(axis_angles, values, facecolor=color,
+                         alpha=fill_alpha)
+            x, y = lines[0].get_data()
+            new_x = concatenate((x, [x[0]]))
+            new_y = concatenate((y, [y[0]]))
+            lines[0].set_data(new_x, new_y)
+        subplot.legend(legends_values)

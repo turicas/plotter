@@ -300,3 +300,10 @@ class TestCsvPlot(unittest.TestCase):
         my_plot.linear(ignore=['product_name', 'year'])
         with self.assertRaises(OverflowError):
             my_plot.linear(ignore=['product_name', 'year'])
+
+    def test_16_radar_plot(self):
+        image_filename = get_filename_from_frame(inspect.currentframe())
+        my_plot = Plotter(self.data['bar-data'])
+        my_plot.radar(axis_labels='product_name', values='quantity',
+                      legends='year', title='Products by year')
+        my_plot.save(image_filename)
