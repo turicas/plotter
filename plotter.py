@@ -66,13 +66,12 @@ class Plotter(object):
                 style='o-', ignore='', colors=None,
                 colormap=matplotlib.cm.PRGn, order_by=None, ordering='asc',
                 x_label=None, y_lim=None, legend_location='upper center',
-                legend_box=(0.5, 2.2)):
+                legend_box=(0.5, 2.2), y_label=''):
         subplot = self._get_new_subplot()
         subplot.set_title(title)
         subplot.grid(grid)
-        if order_by is None:
-            order_by = x_column
-        self.data.order_by(order_by, ordering)
+        if order_by is not None:
+            self.data.order_by(order_by, ordering)
         if legends is True:
             legends = {header: header for header in self.data.headers}
         if self.data.types[x_column] in (datetime.date, datetime.datetime):
@@ -81,7 +80,9 @@ class Plotter(object):
             if x_label is None:
                 x_label = x_column
             subplot.set_xlabel(x_label)
-        x_values = range(len(self.data[x_column]))
+            subplot.set_ylabel(y_label)
+        x_values = range(1, len(self.data[x_column]) + 1)
+        subplot.set_xlim(0, max(x_values) + 1)
         columns_to_plot = []
         for header in set(self.data.headers) - set(ignore):
             if header != x_column and self.data.types[header] in (int, float):
@@ -107,7 +108,7 @@ class Plotter(object):
     def bar(self, title='', grid=True, count=None, bar_width=0.8, x_column='',
             bar_start=0.5, bar_increment=1.0, legends=True,
             x_rotation=0, colors=None, colormap=matplotlib.cm.PRGn,
-            y_label=None, y_lim=None):
+            y_label=None, y_lim=None, y_columns=None):
         if legends is True:
             legends = {header: header for header in self.data.headers}
         subplot = self._get_new_subplot()
@@ -119,9 +120,13 @@ class Plotter(object):
             counter = Counter(self.data[count])
             xticklabels = counter.keys()
             columns_to_plot = [[counter[k] for k in xticklabels]]
+            if y_columns is not None:
+                columns_to_plot = y_columns
         else:
             columns_to_plot = []
-            for header in self.data.headers:
+            if y_columns is None:
+                y_columns = self.data.headers[:]
+            for header in y_columns:
                 if self.data.types[header] in (int, float):
                     columns_to_plot.append(self.data[header])
                     bars_titles.append(header)
@@ -139,11 +144,13 @@ class Plotter(object):
         xticks = [bar_start + bar_increment * (i + 0.5) \
                   for i in range(len(lefts))]
         subplot.set_xticks(xticks)
+        subplot.set_xlim((min(xticks) - 2 * bar_start,
+                          max(xticks) + 2 * bar_start))
         if legends:
             if count is None:
                 bars_titles = [legends[header] \
-                               for header in self.data.headers]
-                xticklabels = xticks
+                               for header in bars_titles]
+                xticklabels = self.data[x_column]
             else:
                 bars_titles = [legends[count]]
             subplot.legend(bars, bars_titles)
@@ -186,8 +193,10 @@ class Plotter(object):
             subplot.legend(loc=legend_location, bbox_to_anchor=legend_box)
         self.fig.subplots_adjust(bottom=0.1, left=0.25)
 
-    def radar(self, axis_labels, values, legends, title='', grid=True,
-              fill_alpha=0.25, colors=None, colormap=matplotlib.cm.gist_heat):
+    def radar(self, axis_labels, values, legends_column, title='', grid=True,
+              fill_alpha=0.25, colors=None, colormap=matplotlib.cm.gist_heat,
+              legend_location='upper left', legend_box=(-0.4, 1),
+              legends=False):
         subplot = self._get_new_subplot(projection='polar')
         subplot.set_title(title)
         subplot.grid(grid)
@@ -197,7 +206,7 @@ class Plotter(object):
         axis_angles = 2 * pi * linspace(0, 1 - 1.0 / number_of_axis,
                                         number_of_axis)
         subplot.set_thetagrids(axis_angles * 180 / pi, axis_labels_values)
-        legends_values = list(set(self.data[legends]))
+        legends_values = list(set(self.data[legends_column]))
         legends_values.sort()
         if colors is None:
             len_legends = len(legends_values)
@@ -206,7 +215,7 @@ class Plotter(object):
         curves = {x: Counter() for x in legends_values}
         self.data.order_by(axis_labels)
         for row in self.data.to_list_of_dicts(encoding=None):
-            curves[row[legends]][row[axis_labels]] += row[values]
+            curves[row[legends_column]][row[axis_labels]] += row[values]
         for key in legends_values:
             values = [curves[key][x] for x in axis_labels_values]
             color = colors.pop(0)
@@ -217,4 +226,12 @@ class Plotter(object):
             new_x = concatenate((x, [x[0]]))
             new_y = concatenate((y, [y[0]]))
             lines[0].set_data(new_x, new_y)
-        subplot.legend(legends_values)
+        if legends:
+            subplot.legend(legends_values, loc=legend_location,
+                           bbox_to_anchor=legend_box)
+
+    def pie(self, labels_column, values_column, title=''):
+        subplot = self._get_new_subplot()
+        subplot.pie(self.data[values_column], labels=self.data[labels_column],
+                    autopct='%2.2f%%')
+        subplot.set_title(title)
