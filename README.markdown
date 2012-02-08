@@ -11,8 +11,7 @@ and bar plots with data from CSV files.
 Requirements/Installation
 -------------------------
 
-- Execute `pip install numpy matplotlib`
-- [Download outputty](https://github.com/turicas/outputty/tarball/master)
+- Execute `pip install numpy matplotlib outputty`
 - [Download plotter](https://github.com/turicas/plotter/tarball/master)
 - Unpack `outputty` and `plotter` in the same directory (sorry for that - it'll
   be available on PyPI soon)
