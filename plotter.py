@@ -3,7 +3,7 @@
 
 import datetime
 from collections import Counter
-from numpy import linspace, array, zeros, pi, concatenate
+from numpy import linspace, array, zeros, pi, concatenate, arange
 from matplotlib.pyplot import figure
 import matplotlib.cm
 from outputty import Table
@@ -193,13 +193,15 @@ class Plotter(object):
             subplot.legend(loc=legend_location, bbox_to_anchor=legend_box)
         self.fig.subplots_adjust(bottom=0.1, left=0.25)
 
-    def radar(self, axis_labels, values, legends_column, title='', grid=True,
-              fill_alpha=0.25, colors=None, colormap=matplotlib.cm.gist_heat,
+    def radar(self, axis_labels, values, legends_column, title='',
+              x_grid=False, y_grid=True, fill_alpha=0.5, colors=None,
+              colormap=matplotlib.cm.gist_heat,
               legend_location='upper left', legend_box=(-0.4, 1),
               legends=False):
         subplot = self._get_new_subplot(projection='polar')
         subplot.set_title(title)
-        subplot.grid(grid)
+        subplot.xaxis.grid(x_grid)
+        subplot.yaxis.grid(y_grid)
         axis_labels_values = list(set(self.data[axis_labels]))
         axis_labels_values.sort()
         number_of_axis = len(axis_labels_values)
@@ -230,7 +232,27 @@ class Plotter(object):
             subplot.legend(legends_values, loc=legend_location,
                            bbox_to_anchor=legend_box)
 
-    def pie(self, labels_column, values_column, title=''):
+    def radar_area(self, values_column, labels_column, title='',
+                   x_grid=False, y_grid=True, fill_alpha=0.5, colors=None,
+                   colormap=matplotlib.cm.gist_heat, spacing=0.05):
+        subplot = self._get_new_subplot(projection='polar')
+        subplot.set_title(title)
+        subplot.xaxis.grid(x_grid)
+        subplot.yaxis.grid(y_grid)
+        values = self.data[values_column]
+        labels = self.data[labels_column]
+        if colors is None:
+            len_labels = len(labels)
+            color_range = linspace(0, 1 - 1.0 / len_labels, len_labels)
+            colors = [colormap(i) for i in color_range]
+        xticks = arange(0, 2 * pi, 2 * pi / len(labels)) + spacing / 2.0
+        width = xticks[1] - xticks[0] - spacing
+        subplot.bar(xticks, values, width=width, color=colors,
+                    alpha=fill_alpha)
+        subplot.set_xticks(xticks + width / 2.0)
+        subplot.set_xticklabels(labels)
+
+    def pie(self, values_column, labels_column, title=''):
         subplot = self._get_new_subplot()
         subplot.pie(self.data[values_column], labels=self.data[labels_column],
                     autopct='%2.2f%%')
