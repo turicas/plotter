@@ -1,0 +1,2 @@
+- Radar plots like [polar bar example](http://matplotlib.sourceforge.net/examples/pylab_examples/polar_bar.html)
+- [TreeMap](http://www.scipy.org/Cookbook/Matplotlib/TreeMap)
