@@ -12,7 +12,12 @@ from outputty import Table
 class Plotter(object):
     'Stores information about a plot and plot it'
 
-    def __init__(self, data=None, rows=1, cols=1, width=1024, height=768):
+    def __init__(self,
+                 data=None,
+                 rows=1,
+                 cols=1,
+                 width=1024,
+                 height=768):
         self.rows = rows
         self.cols = cols
         self._subplot_number = 0
@@ -40,8 +45,14 @@ class Plotter(object):
         #self.fig.savefig(filename, bbox_inches='tight', pad_inches=0.1)
         self.fig.savefig(filename)
 
-    def linear(self, title='', grid=True, style='o-', x_labels=None,
-               legends=True, ignore='', colors=None,
+    def linear(self,
+               title='',
+               grid=True,
+               style='o-',
+               x_labels=None,
+               legends=True,
+               ignore='',
+               colors=None,
                colormap=matplotlib.cm.PRGn):
         if legends is None or legends is True:
             legends = {header: header for header in self.data.headers}
@@ -62,10 +73,21 @@ class Plotter(object):
             subplot.set_xticklabels(self.data[x_labels])
         subplot.legend()
 
-    def scatter(self, x_column, title='', grid=True, labels=True, legends=True,
-                style='o-', ignore='', colors=None,
-                colormap=matplotlib.cm.PRGn, order_by=None, ordering='asc',
-                x_label=None, y_lim=None, legend_location='upper center',
+    def scatter(self,
+                x_column,
+                title='',
+                grid=True,
+                labels=True,
+                legends=True,
+                style='o-',
+                ignore='',
+                colors=None,
+                colormap=matplotlib.cm.PRGn, 
+                order_by=None,
+                ordering='asc',
+                x_label=None,
+                y_lim=None,
+                legend_location='upper center',
                 legend_box=(0.5, 2.2), y_label=''):
         subplot = self._get_new_subplot()
         subplot.set_title(title)
@@ -105,10 +127,21 @@ class Plotter(object):
             subplot.legend(loc=legend_location, bbox_to_anchor=legend_box)
             self.fig.subplots_adjust(top=0.5, right=0.9)
 
-    def bar(self, title='', grid=True, count=None, bar_width=0.8, x_column='',
-            bar_start=0.5, bar_increment=1.0, legends=True,
-            x_rotation=0, colors=None, colormap=matplotlib.cm.PRGn,
-            y_label=None, y_lim=None, y_columns=None):
+    def bar(self,
+            title='',
+            grid=True,
+            count=None,
+            bar_width=0.8,
+            x_column='',
+            bar_start=0.5,
+            bar_increment=1.0,
+            legends=True,
+            x_rotation=0,
+            colors=None,
+            colormap=matplotlib.cm.PRGn,
+            y_label=None,
+            y_lim=None,
+            y_columns=None):
         if legends is True:
             legends = {header: header for header in self.data.headers}
         subplot = self._get_new_subplot()
@@ -162,10 +195,19 @@ class Plotter(object):
         if y_lim is not None:
             subplot.set_ylim(y_lim)
 
-    def stacked_bar(self, x_column, y_column, y_labels=None, title='',
-                    grid=True, bar_width=0.5, x_rotation=0, legends=True,
-                    legend_location='upper left', legend_box=(-0.4, 1),
-                    colors=None, colormap=matplotlib.cm.gist_heat):
+    def stacked_bar(self,
+                    x_column,
+                    y_column,
+                    y_labels=None,
+                    title='',
+                    grid=True,
+                    bar_width=0.5,
+                    x_rotation=0,
+                    legends=True,
+                    legend_location='upper left',
+                    legend_box=(-0.4, 1),
+                    colors=None,
+                    colormap=matplotlib.cm.gist_heat):
         subplot = self._get_new_subplot()
         subplot.set_title(title)
         subplot.grid(grid)
@@ -193,10 +235,18 @@ class Plotter(object):
             subplot.legend(loc=legend_location, bbox_to_anchor=legend_box)
         self.fig.subplots_adjust(bottom=0.1, left=0.25)
 
-    def radar(self, axis_labels, values, legends_column, title='',
-              x_grid=False, y_grid=True, fill_alpha=0.5, colors=None,
+    def radar(self,
+              axis_labels,
+              values,
+              legends_column,
+              title='',
+              x_grid=False,
+              y_grid=True,
+              fill_alpha=0.5,
+              colors=None,
               colormap=matplotlib.cm.gist_heat,
-              legend_location='upper left', legend_box=(-0.4, 1),
+              legend_location='upper left',
+              legend_box=(-0.4, 1),
               legends=False):
         subplot = self._get_new_subplot(projection='polar')
         subplot.set_title(title)
@@ -232,9 +282,16 @@ class Plotter(object):
             subplot.legend(legends_values, loc=legend_location,
                            bbox_to_anchor=legend_box)
 
-    def radar_area(self, values_column, labels_column, title='',
-                   x_grid=False, y_grid=True, fill_alpha=0.5, colors=None,
-                   colormap=matplotlib.cm.gist_heat, spacing=0.05):
+    def radar_area(self,
+                   values_column,
+                   labels_column,
+                   title='',
+                   x_grid=False,
+                   y_grid=True,
+                   fill_alpha=0.5,
+                   colors=None,
+                   colormap=matplotlib.cm.gist_heat,
+                   spacing=0.05):
         subplot = self._get_new_subplot(projection='polar')
         subplot.set_title(title)
         subplot.xaxis.grid(x_grid)
