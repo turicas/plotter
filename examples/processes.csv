@@ -1,13 +1,5 @@
-year,state,processes
-2007,MG,54563
-2007,RJ,67282
-2007,RS,94445
-2007,SP,134511
-2008,MG,36661
-2008,RJ,48119
-2008,RS,54499
-2008,SP,90628
-2009,MG,22601
-2009,RJ,23080
-2009,RS,30897
-2009,SP,44668
+name,subject,gym,self_study,point_for_subjects 
+Laura Aldasheva,25h,1h,5h,85
+Alibek Orynbek,16h,3h,15h,90
+Leyla Rzaeva,28h,3h,5h,85
+Arailym Tleubayeva,10h,5h,4h,95
